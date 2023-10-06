@@ -14,12 +14,15 @@ urlpatterns = [
     # path for registration
 
     # path for login
+    path('login/', views.login_request, name='login'),
 
     # path for logout
+    path('logout/', views.logout_request, name='logout'),
 
     path('', views.get_dealerships, name='index'),
 
     # path for dealer reviews view
+    path('signup/', views.registration_request, name='signup'),
 
     # path for add a review view
 
