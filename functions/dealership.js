@@ -11,12 +11,12 @@ const { CloudantV1 } = require('@ibm-cloud/cloudant');
 const { IamAuthenticator } = require('ibm-cloud-sdk-core');
 
 async function main(params) {
-
-    const authenticator = new IamAuthenticator({apikey: params.IAM_API_KEY});
+    const authenticator = new IamAuthenticator({ apikey: params.IAM_API_KEY });
     const service = new CloudantV1({ authenticator });
     service.setServiceUrl(params.COUCH_URL);
 
     const state = params.state;
+    const dealerId = params.dealerId ? parseInt(params.dealerId) : undefined; // Parse id as integer
 
     try {
         const inputDocuments = await service.postAllDocs({
@@ -26,14 +26,16 @@ async function main(params) {
 
         const rows = inputDocuments.result.rows;
 
-        if (rows.length === 0){
-            return {statusCode: 404, body: "The database is empty"};
+        if (rows.length === 0) {
+            return { statusCode: 404, body: "The database is empty" };
         }
 
-        const outputArray = rows.map(({ doc }) => {
-            if (state === undefined || doc.state === state){
+        let matchingDocs = rows.map(({ doc }) => {
+            if ((state === undefined || doc.state === state) && (dealerId === undefined || doc.id === dealerId)) {
                 return {
                     id: doc.id,
+                    full_name: doc.full_name,
+                    short_name: doc.short_name,
                     city: doc.city,
                     state: doc.state,
                     st: doc.st,
@@ -46,13 +48,17 @@ async function main(params) {
             return null; // Filter out unwanted items
         }).filter(item => item !== null);
 
-        if(outputArray.length === 0){
-            return {statusCode: 404, body: "The state does not exist"};
+        if (state !== undefined && matchingDocs.length === 0) {
+            return { statusCode: 404, body: "No matching documents found for the provided state" };
         }
 
-        return {statusCode: 200, body: outputArray };
+        if (dealerId !== undefined && matchingDocs.length === 0) {
+            return { statusCode: 404, body: "No matching documents found for the provided dealerId" };
+        }
+
+        return { statusCode: 200, body: matchingDocs };
     } catch (error) {
-        return {statusCode: 500, body: "Something went wrong on the server"};
+        return { statusCode: 500, body: "Something went wrong on the server" };
     }
 }
 

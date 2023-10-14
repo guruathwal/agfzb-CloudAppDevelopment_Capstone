@@ -64,6 +64,10 @@ def add_review(doc_data):
 
         # Insert the 'id' attribute
         doc_data["id"] = doc_count + 1
+
+        if doc_data["purchase"] is None:
+            doc_data["purchase"] = False
+
         # Insert the new document
         response = service.post_document(db=db_name, document=doc_data).get_result()
 
