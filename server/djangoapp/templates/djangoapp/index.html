@@ -1,76 +1,129 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Dealership Review</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-    <link href="https://unpkg.com/bootstrap-table@1.18.2/dist/bootstrap-table.min.css" rel="stylesheet">
-    <script src="https://unpkg.com/bootstrap-table@1.18.2/dist/bootstrap-table.min.js"></script>
-    <script src="https://unpkg.com/bootstrap-table@1.18.2/dist/extensions/filter-control/bootstrap-table-filter-control.min.js"></script>
 
+<head>
+  <meta charset="UTF-8">
+  <title>Dealership Review</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <link href="https://unpkg.com/bootstrap-table@1.22.1/dist/bootstrap-table.min.css" rel="stylesheet">
+  <script src="https://unpkg.com/bootstrap-table@1.22.1/dist/bootstrap-table.min.js"></script>
+  <script
+    src="https://unpkg.com/bootstrap-table@1.22.1/dist/extensions/filter-control/bootstrap-table-filter-control.min.js"></script>
+  <style>
+    body {
+      margin-bottom: 80px; /* Margin bottom by footer height */
+    }
+    html {
+      position: relative;
+      min-height: 100%;
+    }
+
+    .container {
+      width: 100vw;
+      padding: 0 15px;
+    }
+
+    .footer {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      /* Set the fixed height of the footer here */
+      background-color: #f5f5f5;
+    }
+  </style>
 </head>
 
-    <body>
-        <!-- Navigation Bar -->
-        <nav class="navbar navbar-expand-md bg-dark navbar-dark sticky-top">
-          <a class="navbar-brand" href="#">Best Cars Dealership</a>
-          <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navb" aria-expanded="true">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div id="navb" class="navbar-collapse collapse hide">
-            <ul class="navbar-nav">
-              <li class="nav-item">
-                <a class="nav-link active" href="{% url 'djangoapp:index' %}">Home</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="{% url 'djangoapp:about' %}">About</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="{% url 'djangoapp:contact' %}">Contact</a>
-              </li>
-            </ul>
-      <!--
-            <ul class="nav navbar-nav ml-auto">
-              <li class="nav-item">
-                <a class="nav-link" href="#"><span class="fas fa-user"></span> Sign Up</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#"><span class="fas fa-sign-in-alt"></span> Login</a>
-              </li>
-            </ul> -->
+<body>
+  <!-- Navigation Bar -->
+  <nav class="navbar navbar-expand-md bg-dark navbar-dark sticky-top">
+    <a class="navbar-brand" href="#">Best Cars Dealership</a>
+    <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navb"
+      aria-expanded="true">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div id="navb" class="navbar-collapse collapse hide">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link active" href="{% url 'djangoapp:index' %}">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'djangoapp:about' %}">About</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'djangoapp:contact' %}">Contact</a>
+        </li>
+      </ul>
+      <ul class="nav navbar-nav ml-auto">
+        {% if user.is_authenticated %}
+        <li class="nav-item">
+          <span class="nav-link">Welcome, {{ user.first_name|default:user.username }}</span>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'djangoapp:logout' %}?next={{ request.path }}">Logout</a>
+        </li>
+        {% else %}
+        <li class="nav-item">
+          <form class="form-inline" action="{% url 'djangoapp:login' %}?next={{ request.path }}" method="post">
+            {% csrf_token %}
+            <input class="form-control mr-2" type="text" name="username" placeholder="Username" required>
+            <input class="form-control mr-2" type="password" name="password" placeholder="Password" required>
+            <button class="btn btn-primary" type="submit">Login</button>
+          </form>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'djangoapp:signup' %}">Signup</a>
+        </li>
+        {% endif %}
+      </ul>
 
+    </div>
+  </nav>
 
-            <ul class="nav navbar-nav ml-auto">
-              {% if user.is_authenticated %}
-                  <li class="nav-item">
-                      <span class="nav-link">Welcome, {{ user.first_name|default:user.username }}</span>
-                  </li>
-                  <li class="nav-item">
-                      <a class="nav-link" href="{% url 'djangoapp:logout' %}">Logout</a>
-                  </li>
-              {% else %}
-                  <li class="nav-item">
-                      <form class="form-inline" action="{% url 'djangoapp:login' %}" method="post">
-                          {% csrf_token %}
-                          <input class="form-control mr-2" type="text" name="username" placeholder="Username" required>
-                          <input class="form-control mr-2" type="password" name="password" placeholder="Password" required>
-                          <button class="btn btn-primary" type="submit">Login</button>
-                      </form>
-                  </li>
-                  <li class="nav-item">
-                      <a class="nav-link" href="{% url 'djangoapp:signup' %}">Signup</a>
-                  </li>
-              {% endif %}
-            </ul>
+  <main role="main" class="container">
 
-          </div>
-        </nav>
+  <h3 class="mb-4 pt-4">Dealerships</h3>
+  <!--Add a dealer table here -->
+      <table class="table .table-borderless" id="table" data-filter-control="true" style="min-width: 1000px;">
+        <thead>
+          <tr>
+            <th scope="col" data-field="id">ID</th>
+            <th scope="col" data-field="name">Dealer Name</th>
+            <th scope="col" data-field="city">City</th>
+            <th scope="col" data-field="address">Address</th>
+            <th scope="col" data-field="zip">Zip</th>
+            <th scope="col" data-field="state" data-filter-control="select">State</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for dealer in dealerships %}
+          <tr>
+            <th scope="row">{{dealer.id}}</th>
+            <td><a href="{% url 'djangoapp:dealer_details' dealer.id %}">{{dealer.full_name}}</a></td>
+            <td>{{dealer.city}}</td>
+            <td>{{dealer.address}}</td>
+            <td>{{dealer.zip}}</td>
+            <td>{{dealer.st}}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+</main>
+  <!-- Footer -->
+  <footer class="footer bg-dark text-white text-center py-3">
+    <div class="container">
+      <span>&copy; 2023 Best Cars Dealership</span>
+    </div>
+  </footer>
+  <!-- </div> -->
+</body>
 
-    <!--Add a dealer table here -->
-
-    </body>
+<script>
+  $(function () {
+    $('#table').bootstrapTable()
+  })
+</script>
 
 </html>
