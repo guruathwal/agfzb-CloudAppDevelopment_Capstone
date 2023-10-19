@@ -29,6 +29,12 @@ APPEND_SLASH = True
 
 ALLOWED_HOSTS = ["*"]
 
+#CSRF_TRUSTED_ORIGINS = ['*']
+
+# when the Django app is running behind a proxy set the following to true
+USE_X_FORWARDED_HOST = True
+USE_X_FORWARDED_PORT = True
+
 
 # Application definition
 
